@@ -432,6 +432,7 @@ class ModernSettingsDialog(QDialog):
             ("当前时间", "time"),
             ("余额峰谷", "balance_tier"),
             ("余额数值", "balance"),
+            ("Magpie 额度轮播", "magpie"),
             ("自定义短文本", "custom"),
         ):
             self.island_info_mode_select.addItem(label, value)
@@ -620,7 +621,7 @@ class ModernSettingsDialog(QDialog):
                     SettingRow("dynamic_island_name", "显示名称", "显示当前角色名称。", self.island_name_check),
                     SettingRow("dynamic_island_info", "显示中间信息栏", "显示时间/余额/自定义短文本等信息。", self.island_info_check),
                     SettingRow("dynamic_island_status", "显示状态灯", "显示右侧状态圆点。", self.island_status_check),
-                    SettingRow("dynamic_island_info_mode", "信息栏显示什么", "选择信息栏显示的内容；自定义文本在下方填写。", self.island_info_mode_select),
+                    SettingRow("dynamic_island_info_mode", "信息栏显示什么", "Magpie 额度每 5 秒轮播、每分钟读取本机缓存；悬停查看全部。自定义文本在下方填写。", self.island_info_mode_select),
                     SettingRow(
                         "dynamic_island_style",
                         "背景风格",

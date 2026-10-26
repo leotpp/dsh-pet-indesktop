@@ -307,7 +307,7 @@ WINDOW_PY_LINE_BUDGET = 4671
 # 按文件约定只随实测校准，不为达标压行（拆分仍是待办）。
 # 2026-10-22 上调到 2722：AI 域新增「场景扮演」组的一行 claim（roleplay_enabled /
 # roleplay_scene），行本体在 _AiSettingsPage。实测 2722。
-MODERN_SETTINGS_DIALOG_PY_LINE_BUDGET = 2722  # 2026-10-22：场景扮演组 claim 一行
+MODERN_SETTINGS_DIALOG_PY_LINE_BUDGET = 2723  # 2026-10-26：信息栏选择器新增 Magpie 选项一行
 
 
 def _read(name: str) -> str:

@@ -629,7 +629,7 @@ def _default_dynamic_island_data() -> dict:
         "show_icon": True,
         "show_name": True,
         "show_info": True,
-        "info_mode": "time",  # time / balance_tier / balance / custom
+        "info_mode": "time",  # time / balance_tier / balance / magpie / custom
         "custom_text": "",
         "show_status": True,
         "style": "dark",  # dark / light / glass
@@ -689,7 +689,7 @@ def _clean_dynamic_island_data(value) -> dict:
     result["show_info"] = bool(result["show_info"])
     result["show_status"] = bool(result["show_status"])
     mode = str(result.get("info_mode") or "time").strip()
-    result["info_mode"] = mode if mode in {"time", "balance_tier", "balance", "custom"} else "time"
+    result["info_mode"] = mode if mode in {"time", "balance_tier", "balance", "magpie", "custom"} else "time"
     result["custom_text"] = str(result.get("custom_text") or "")[:80]
     style = str(result.get("style") or "dark").strip()
     result["style"] = style if style in {"dark", "light", "glass"} else "dark"

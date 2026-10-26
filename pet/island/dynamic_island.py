@@ -547,6 +547,7 @@ class DynamicIsland(QWidget):
         self._press_global: QPoint | None = None
         self._balance_tier_text = "余额峰谷 --"
         self._balance_text = "余额 --"
+        self._magpie = None
         self._pet_visible = True
         # 本构建是否具备聊天能力（AppShell 按 enable_chat 喂入，默认 True
         # 维持现状；纯桌宠版置 False 时 hidden_chat 单击路由回退展开卡片）
@@ -1170,6 +1171,33 @@ class DynamicIsland(QWidget):
         # 早于它们同步就会拿着过期的细条态去收口或恢复（P2 Slice E6）
         self._sync_content_sampling()
         self._sync_sonar_ring()          # 同上：判据含模式与 show_status，都要最后判
+        self._refresh()
+
+    # ------------------------------------------------------------ Magpie 额度
+    def _sync_magpie(self) -> None:
+        active = (self.isVisible() and self._visible_parts()[2]
+                  and self._cfg.get("info_mode") == "magpie" and not self._strip_hidden())
+        if active and self._magpie is None:
+            from .magpie import MagpieCarousel
+
+            self._magpie = MagpieCarousel(self)
+            self._magpie.changed.connect(self._magpie_changed)
+            QApplication.instance().aboutToQuit.connect(self._stop_magpie)
+        if self._magpie is not None:
+            self._magpie.set_active(active)
+        if not active:
+            self.setToolTip("")
+
+    def _stop_magpie(self) -> None:
+        if self._magpie is not None:
+            self._magpie.set_active(False)
+        self.setToolTip("")
+
+    def _magpie_changed(self) -> None:
+        from html import escape
+
+        text = "Magpie 缓存额度（由 Magpie 更新）\n" + ("\n".join(self._magpie.lines) or self._magpie.text)
+        self.setToolTip("<qt>" + escape(text).replace("\n", "<br>") + "</qt>")
         self._refresh()
 
     # ------------------------------------------------------------ 余额峰谷
@@ -2888,6 +2916,10 @@ class DynamicIsland(QWidget):
             text = self._balance_tier_display_text()
             sample = _PRIMARY_SAMPLES["balance_tier"]
             elide_px = 0
+        elif mode == "magpie":
+            text, sample = (self._magpie.display(self._metrics_for("primary"))
+                            if self._magpie is not None else ("Magpie · 查询中…", "Magpie · 查询中…"))
+            elide_px = _PRIMARY_ELIDE_PX
         elif mode == "balance":
             text = self._balance_text
             sample = _PRIMARY_SAMPLES["balance"]
@@ -3433,6 +3465,7 @@ class DynamicIsland(QWidget):
         滑出与收回）。状态记忆在 ``_strip_sampling_off``，与折叠态同一套
         "变了才同步"的口径——重复调用是幂等的。
         """
+        self._sync_magpie()
         hidden = self._strip_hidden()
         if hidden == self._strip_sampling_off:
             return
@@ -4362,6 +4395,7 @@ class DynamicIsland(QWidget):
         全部停表，隐藏态零定时器空转。"""
         super().hideEvent(event)
         self._info_timer.stop()
+        self._stop_magpie()
         self._tier_tick_timer.stop()
         self._anim_timer.stop()
         self._dock_back_timer.stop()
@@ -4438,6 +4472,7 @@ class DynamicIsland(QWidget):
         # 有界等待在采集线程自己那边，GUI 线程上等它就是"关个岛卡三秒"）。还有别的
         # 岛在看读数时，这一岛的销毁不会把采集链路带走（宿主按岛计数）。
         self._release_fps_slot()
+        self._stop_magpie()
         super().closeEvent(event)
 
     def showEvent(self, event) -> None:  # noqa: N802
@@ -4446,6 +4481,7 @@ class DynamicIsland(QWidget):
         super().showEvent(event)
         self._finish_animations()
         self._info_timer.start()
+        self._sync_magpie()
         if self._mode == "expanded":
             # 隐藏期间卡片还开着（hideEvent 停了每秒 tick）：显示回来就接上，
             # 否则"更新时间"会冻在隐藏那一刻
