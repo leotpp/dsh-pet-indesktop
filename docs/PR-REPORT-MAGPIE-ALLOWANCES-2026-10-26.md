@@ -91,3 +91,19 @@
 - 本机 `启动桌宠.command` 改为调用 `open` 启动 App；旧源码启动脚本另存本地备份。上述启动文件、App 与私人配置都不入库，不发布 GitHub Release。
 
 本轮未修改产品运行代码，未重跑全量套件；安装后资源校验、严格签名校验与实际 GUI 启动均通过。README 补充 App 优先的启动方式。本机自用包采用 ad-hoc 签名，未进行 Apple 公证或 Intel Mac 验证。
+
+## 第三轮：恢复完整动画与随机动作
+
+用户反馈打包后动作减少。通过真实 `MovieLibrary` → `catalog.build_categories` → `build_animation_categories` 对照，源码 106 段素材产生 95 个随机/事件动作，而第二轮精简 App 只有 11 段基础素材、0 个随机动作；同一菜单探针在旧 App 明确失败。原因是本机打包采用了上游 macOS CI 的裁剪步骤，删除 `videos/random`、`videos/events` 及对应帧序列。它不符合本 fork 保留完整桌宠动作的目标。
+
+本轮修改 `.github/workflows/build-macos.yml`：移除动画裁剪步骤，将帧序列准备范围改为 `random,events`；`tests/test_ci_workflows.py` 新增保留动作素材的回归（旧流程 1 failed，修改后流程及素材门族 123 passed / 1 skipped）。README 明确完整动作范围。产品运行代码和用户配置不改。
+
+本机独立构建目录保留全部源素材，使用既有 `convert_clip` 和原有无损 v6 编码参数、4 个低优先级进程补齐缺失帧序列。106 段中复用 17 段、新转 89 段、失败 0，转换耗时 901.88 秒；106 段全部通过素材硬门。完整 App 构建与产物验证耗时 109.29 秒。体积由精简包 604.0 MiB 增至 2155.7 MiB，增加的是完整动画资源，不新增常驻服务或网络轮询；未做完整动作长时间播放的内存基准。
+
+安装后再次对实际 `~/Applications/Magpie 桌宠.app` 运行菜单探针：`source_clips=106, installed_clips=106, source_acts=95, installed_acts=95, missing_menu_actions=[]`。95 项菜单播放回调均触发；「写代码」「吃Token」「工作状态-思考冒泡」实际用 `FrameSeqClip` 解码并推进到第 3 帧，图像为 640×360。未逐一人工观看全部 106 段动画。
+
+已正常退出精简版、留存本机备份后替换同一路径并启动完整 App。新进程 PID 57591、父进程 1；Dock activationPolicy=1，Magpie 本机连接存在，启动后严格签名校验退出码 0。配置、数据目录与开机启动目标不变。完整派生素材也同步回本地构建缓存，源仓库硬门同样 106/106 通过；帧序列和 App 二进制不入库。
+
+全量四分片回归：9014 passed / 83 skipped / 3 failed。剩余仍为前次已在基线复现的两个共享媒体解码用例及一个本机 pnpm 路径发现用例；本轮没有新增失败。
+
+本轮文件增删：macOS 工作流 +3/−9、README +1/−1、工作流回归测试 +9/−0、本报告追加 +16/−0。最终相关检查 355 passed，ruff 和 `git diff --check` 通过；完整本地素材就绪后，原先因素材缺失而跳过的门禁也实际通过。

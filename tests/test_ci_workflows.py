@@ -410,6 +410,15 @@ class TestPrTestCaptureAndFailureDiagnostics:
 class TestBuildWorkflowStructure:
     """三条 build-*.yml 的共用契约（参数化，逐端跑同一套断言）。"""
 
+    def test_macos_preserves_random_and_event_animations(self):
+        text = _without_comments(_text(BUILDS["macos"]))
+        assert not re.search(
+            r"rm[^\n]*assets/characters/shenshen/(?:videos|frameseq)/(?:random|events)", text
+        ), "macOS 安装包必须保留随机动作和事件动作素材"
+        prepare = _run_text(_step_block(text, "Prepare frameseq material"))
+        assert "--include random,events" in prepare, "必须为完整动作集合准备帧序列"
+
+
     @pytest.mark.parametrize("name", sorted(BUILDS))
     def test_has_source_ref_and_upload_switch_off_by_default(self, name):
         text = _text(BUILDS[name])

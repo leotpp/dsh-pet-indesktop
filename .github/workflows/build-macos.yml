@@ -113,14 +113,8 @@ jobs:
       # Pillow/imageio-ffmpeg 版本」算出：命中即近零成本，未命中才重转 106 段
       # （冷缓存约 28 min）。缓存里是本仓库公开源素材的派生物，不含任何 secret，
       # 且缓存只是构建期缓存、不是发布产物。
-      # 发布形态 = 精简内置（2026-10-22 定）：只带 core 闭包五类（idle/move/turn/
-      # click/drag，共 11 段），events/random 由素材包按需安装。必须在算缓存 key
-      # 之前删——源摘要不同，缓存命名空间随之分开。
-      - name: Slim bundled assets to core closure
-        shell: bash
-        run: |
-          rm -rf assets/characters/shenshen/frameseq/events assets/characters/shenshen/frameseq/random
-          rm -rf assets/characters/shenshen/videos/events assets/characters/shenshen/videos/random
+      # 本 fork 的 macOS 安装包保留完整动作；缓存 key 覆盖全部源素材。
+      # random/events 必须一起准备，避免动作菜单和随机播放随打包丢失。
 
       - name: Compute frameseq cache key
         id: frameseq-cache
@@ -137,7 +131,7 @@ jobs:
       # 命令的真实退出码原样冒泡。两个变体共用这一次素材准备，不重复转。
       - name: Prepare frameseq material
         shell: bash
-        run: python scripts/prepare_frameseq_bundle.py --character shenshen --include ""
+        run: python scripts/prepare_frameseq_bundle.py --character shenshen --include random,events
 
       # 构建入口与本地完全一致：scripts/build_macos.sh（PyInstaller 打包 +
       # 中文编码自检 + ad-hoc 签名都在脚本内完成），CI 不内联
