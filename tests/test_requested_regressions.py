@@ -173,7 +173,8 @@ def test_readme_harness_autostart_paragraph_matches_the_launch_gates():
     """
     from pathlib import Path
 
-    readme = (Path(__file__).resolve().parents[1] / "README.md").read_text(encoding="utf-8")
+    # 原 README 的完整说明已迁入使用指南；继续守住文案与运行行为的一致性。
+    readme = (Path(__file__).resolve().parents[1] / "USER-GUIDE.md").read_text(encoding="utf-8")
     para = next((line for line in readme.splitlines() if "随桌宠启动 dsh 服务" in line), None)
     assert para is not None, "README 里找不到「随桌宠启动 dsh 服务」段落"
     assert "DSH 联动" in para
@@ -186,7 +187,7 @@ def test_readme_harness_autostart_paragraph_matches_the_launch_gates():
 def _readme_text():
     from pathlib import Path
 
-    return (Path(__file__).resolve().parents[1] / "README.md").read_text(encoding="utf-8")
+    return (Path(__file__).resolve().parents[1] / "USER-GUIDE.md").read_text(encoding="utf-8")
 
 
 def test_readme_documents_the_new_global_hotkey_section():
