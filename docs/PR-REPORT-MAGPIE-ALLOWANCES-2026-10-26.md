@@ -76,3 +76,18 @@
 ## 已知限制与恢复
 
 仅连接默认本机端口；未开放自定义地址/密钥。访问受限时如实提示。读取 Magpie 缓存，数值不比 Magpie 本身更新更快；不自动登录账户、不发语音。长行在胶囊内省略，完整内容可悬停查看。切回“当前时间”即停止该功能；原安装包需运行含本改动的源码或重新构建才能提供新选项。
+
+## 第二轮：macOS 独立 App 打包与安装
+
+基线 `c33a381a`，本节为后续验收记录；上方增删表保留首次功能提交的数字。使用现有 `scripts/build_macos.sh --variants webm-chat`，构建解释器为本仓库 `.venv/bin/python`，PyInstaller 6.22.3、Python 3.13.11、PySide6 6.12.0。工作目录为隔离的 `build/macos-source`，按 `.github/workflows/build-macos.yml` 的正式发布方式只带基础动画闭包：11 段素材及对应帧序列。原源码素材和用户目录均未删除。
+
+- PyInstaller 构建完成耗时约 55.4 秒，安装 App 占用约 604.0 MiB；这是本机单次构建读数，不是启动速度基准。
+- 产物是自带 Python 运行环境的 `arm64` Mach-O `.app`，不是依赖源码目录的命令脚本。`--windowed`、鲸鱼图标、`LSUIElement=true` 和 ad-hoc 签名均已设置。
+- 冻结归档已检查包含 `pet.island.magpie`、`pet.island.dynamic_island`、`pet.__main__`、`build_variant`；OCR 模型/引擎、26 个语音依赖、中文编码和桥接零依赖检查通过。
+- 初次后台构建继承了已被回收的临时目录，桥接检查报 `mkdtemp ENOENT`；将该检查的 `TMPDIR` 指向稳定的 `/tmp` 后通过，没有修改桥接代码。
+- 复制的素材中夹带 `.converting.lock`，首次运行清理旧锁后导致签名缺失资源。最终产物移除该临时锁后重新签名，并在实际启动后再跑 `codesign --verify --deep --strict`，退出码 0。
+- 已安装为 `~/Applications/Magpie 桌宠.app`。通过 macOS `open` 启动，实际主进程 PID 61320、父进程 PID 1，独立于终端；在屏窗口为宠物合成窗和 44px 高的灵动岛，连接本机 `127.0.0.1:3425`，系统 activationPolicy 为 1（隐藏 Dock）。
+- 沿用 `webm-chat` 数据目录，`info_mode=magpie`、`show_dock_icon=false` 保持。原本已启用的 LaunchAgent 改指向新 App，修改前另存备份；未通过注销/登录实测自启。
+- 本机 `启动桌宠.command` 改为调用 `open` 启动 App；旧源码启动脚本另存本地备份。上述启动文件、App 与私人配置都不入库，不发布 GitHub Release。
+
+本轮未修改产品运行代码，未重跑全量套件；安装后资源校验、严格签名校验与实际 GUI 启动均通过。README 补充 App 优先的启动方式。本机自用包采用 ad-hoc 签名，未进行 Apple 公证或 Intel Mac 验证。

@@ -23,7 +23,9 @@
 
 ## 在 macOS 上运行
 
-需要 Python 3.10 或更高版本，建议使用 Python 3.13。
+**日常使用推荐 `.app`**：将构建好的「Magpie 桌宠.app」放到应用程序目录，双击即可启动，无需保持终端窗口开启，也无需另装 Python。隐藏 Dock 图标后，通过宠物右键或顶部托盘打开设置、退出程序。打包流程见 [macOS 构建脚本](scripts/build_macos.sh) 与 [打包说明](docs/ONEDIR_PACKAGING.md)。
+
+以下命令用于源码开发运行，需要 Python 3.10 或更高版本，建议使用 Python 3.13。
 
 ```bash
 git clone https://github.com/leotpp/dsh-pet-indesktop.git
@@ -34,7 +36,7 @@ python -m pip install -r requirements.txt
 python -m pet
 ```
 
-已经配置好本地启动入口时，也可以直接双击 `启动桌宠.command`。该文件是本机启动文件，不随仓库分发。
+本机的 `启动桌宠.command` 已改为打开安装好的 App；日常直接双击 `.app` 即可。该启动文件不随仓库分发。
 
 本 fork 的额度轮播需要运行这里的源码或包含这些改动的构建；上游安装包不会自动获得本 fork 的新功能。
 

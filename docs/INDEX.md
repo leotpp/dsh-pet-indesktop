@@ -146,7 +146,7 @@
 
 ## PR 报告存档
 
-- [Magpie 额度轮播（2026-10-26）](PR-REPORT-MAGPIE-ALLOWANCES-2026-10-26.md)：本机缓存查询、灵动岛轮播、启停与长文本测宽、macOS 实机证据；修改 Magpie 额度协议或轮播生命周期时查阅。
+- [Magpie 额度轮播（2026-10-26）](PR-REPORT-MAGPIE-ALLOWANCES-2026-10-26.md)：本机缓存查询、灵动岛轮播、启停与长文本测宽、macOS 实机及独立 App 打包安装证据；修改 Magpie 额度协议、轮播生命周期或交付 macOS App 时查阅。
 
 - [跨屏过缝通行与落点吸附（2026-10-22）](PR-REPORT-CROSS-SCREEN-CORRIDOR-2026-10-22.md)：跨屏移动语义从 band 收窄改为「通行域=并集（含空洞）、静止域=各屏、四处收口吸附」，含侧墙低速截止、两轮 k3 盲审记录与先红后绿证据；改跨屏拖拽/抛掷物理、写 `_clamp_rects` 多矩形域、动 `snap_to_nearest_screen` 或排查「宠物停在看不见的地方」时必读。**先例**：① 语义改动要逐个收口点查吸附（落地/原地放下/落岛/弹弓取消，漏一个就是把宠钉死在空洞）；② `__init__` 里 set_pos 先于字段初始化，钳制条件必须 getattr 兜底；③ 覆盖判定用并集（QRegion）而非中心点，否则半身悬空漏判。
 - [macOS 多屏与 Dock 修复（2026-10-21）](PR-REPORT-MACOS-DESKTOP-2026-10-21.md)：Mac 双屏每屏一窗、设置进程启动即 Accessory，含用户副屏可见及单 Dock 图标确认、75 秒焦点观察、构建安装与测试证据；改 Mac 拓扑或 Dock 启动策略时查阅；多个 Spaces 的后续修复见下一项。
